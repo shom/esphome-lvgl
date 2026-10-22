@@ -1,5 +1,6 @@
 lvgl:
   buffer_size: 100%
+  rotation: ${rotation | default("90")}
   byte_order: little_endian
   displays: my_display
   touchscreens: my_touchscreen
