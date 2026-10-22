@@ -1,5 +1,6 @@
 packages:
-  device: !include device/device.yaml
+  device: !include 
+    file: device/device.yaml
     vars: 
       rotation: "90"
   sensors: !include device/sensors.yaml
