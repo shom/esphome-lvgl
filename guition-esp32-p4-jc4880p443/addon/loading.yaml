@@ -1,0 +1,63 @@
+# Boot / loading screen logic.
+# The visible overlay lives in device/lvgl.yaml (top_layer -> loading_page).
+# This file holds the state + scripts that drive it. It is dismissed once
+# Home Assistant connects via the native API (see the api hooks in device.yaml).
+
+# Logos are loaded by GitHub raw URL so they resolve in the remote-package
+# build (a relative `file:` path would not). The PNGs live in this repo under
+# assets/images/loading/.
+image:
+  - platform: file
+    type: RGB565
+    transparency: alpha_channel
+    file: 'https://raw.githubusercontent.com/shom/esphome-lvgl/main/guition-esp32-p4-jc4880p443/assets/images/loading/homeassistant.png'
+    id: ha_img
+    resize: 400x82
+  - platform: file
+    type: RGB565
+    transparency: alpha_channel
+    file: 'https://raw.githubusercontent.com/shom/esphome-lvgl/main/guition-esp32-p4-jc4880p443/assets/images/loading/esphome.png'
+    id: esphome_img
+    resize: 320x95
+
+globals:
+  - id: ha_connected
+    type: bool
+    initial_value: 'false'
+
+script:
+  # Called from api.on_client_connected (device.yaml) when HA connects.
+  - id: on_ha_connected
+    then:
+      - lambda: |-
+          if (!id(ha_connected)) {
+            id(ha_connected) = true;
+            lv_label_set_text(id(boot_homeassistant_label), "Home Assistant Connected!");
+            lv_obj_add_flag(id(boot_homeassistant_spiner), LV_OBJ_FLAG_HIDDEN);
+            id(check_boot_status).execute();
+          }
+
+  # Swap the "connecting" row for the "synchronizing" row and run the bar.
+  - id: check_boot_status
+    then:
+      - lambda: |-
+          if (id(ha_connected)) {
+            lv_obj_add_flag(id(boot_homeassistant), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(id(boot_synchronization), LV_OBJ_FLAG_HIDDEN);
+            id(start_sync_animation).execute();
+          }
+
+  # Reveal the real UI underneath, animate the progress bar, then hide overlay.
+  - id: start_sync_animation
+    then:
+      - lvgl.page.show: main_page
+      - delay: 1s
+      - lvgl.bar.update:
+          id: boot_synchronization_bar
+          value: 50
+      - delay: 1s
+      - lvgl.bar.update:
+          id: boot_synchronization_bar
+          value: 100
+      - delay: 500ms
+      - lvgl.widget.hide: loading_page

@@ -11,3 +11,4 @@ packages:
   fonts: !include assets/fonts.yaml
   icons: !include assets/icons.yaml
   button: !include theme/button.yaml
+  loading: !include addon/loading.yaml

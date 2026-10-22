@@ -42,6 +42,20 @@ ota:
 
 # Enable Home Assistant API
 api:
+  on_client_connected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        then:
+          - script.execute: on_ha_connected
+  on_client_disconnected:
+    - if:
+        condition:
+          lambda: 'return (0 == client_info.find("Home Assistant "));'
+        then:
+          - globals.set:
+              id: ha_connected
+              value: 'false'
 
 # Enable logging
 logger:

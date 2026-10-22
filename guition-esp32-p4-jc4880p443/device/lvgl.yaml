@@ -28,6 +28,85 @@ lvgl:
           y: 2
           text_align: center
           text_color: 0xFFFFFF
+
+      # Boot / loading overlay: full-screen button on the top layer so it
+      # covers every page until Home Assistant connects (see addon/loading.yaml).
+      - button:
+          id: loading_page
+          width: 100%
+          height: 100%
+          radius: 0
+          pad_all: 0
+          bg_color: 0x0F172A
+          shadow_opa: TRANSP
+          on_press:
+            - lvgl.widget.hide: loading_page
+          widgets:
+            - image:
+                id: boot_ha_logo
+                src: ha_img
+                align: top_mid
+                y: 50
+            - obj:
+                id: boot_homeassistant
+                align: center
+                width: 360
+                height: 60
+                bg_opa: TRANSP
+                border_width: 0
+                shadow_opa: TRANSP
+                pad_all: 0
+                widgets:
+                  - label:
+                      id: boot_homeassistant_label
+                      text: "Connecting to Home Assistant.."
+                      text_font: clockbar_font
+                      text_color: 0x94A3B8
+                      align: left_mid
+                  - spinner:
+                      id: boot_homeassistant_spiner
+                      width: 40
+                      height: 40
+                      align: right_mid
+                      spin_time: 2s
+                      arc_length: 60deg
+                      arc_width: 5
+                      arc_color: 0x3B82F6
+            - obj:
+                id: boot_synchronization
+                align: center
+                width: 360
+                height: 60
+                bg_opa: TRANSP
+                border_width: 0
+                shadow_opa: TRANSP
+                pad_all: 0
+                hidden: true
+                widgets:
+                  - label:
+                      id: boot_synchronization_label
+                      text: "Synchronizing data..."
+                      text_font: clockbar_font
+                      text_color: 0x94A3B8
+                      align: top_mid
+                  - bar:
+                      id: boot_synchronization_bar
+                      align: bottom_mid
+                      width: 100%
+                      height: 18
+                      value: 0
+                      min_value: 0
+                      max_value: 100
+                      animated: true
+                      bg_color: 0x1E293B
+                      indicator:
+                        bg_color: 0x3B82F6
+            - image:
+                id: boot_esphome_logo
+                src: esphome_img
+                align: bottom_mid
+                y: -50
+
           
   pages:
     - id: main_page
